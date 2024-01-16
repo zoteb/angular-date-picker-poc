@@ -16,9 +16,9 @@ import { DateGlobals } from './utils/date-globals';
 export class FkdsDatePickerComponent implements OnInit {
   public browserMonthName: string = '';
   public browserYearName: string = '';
-  public calendarDays: DatePickerDays[];
-  public calendarMonths: DatePickerDays[];
-  public calendarYears: DatePickerDays[];
+  public calendarDays: DatePickerDays[] | null = null;
+  public calendarMonths: DatePickerDays[] | null = null;
+  public calendarYears: DatePickerDays[]| null = null;
 
   protected now: Date = new Date();
   protected browseDate: Date = new Date();
@@ -28,11 +28,13 @@ export class FkdsDatePickerComponent implements OnInit {
   @Input() monthNames: string[] = DateGlobals.monthNames;
   @Input() weekDaysNames: string[] = DateGlobals.dayNames;
   @Input() disabledDays: Number[] = [0, 6];
-  @Input() maxDate: Date;
-  @Input() minDate: Date;
-  @Input() selectedDate: Date;
+  @Input() maxDate: Date| null = null;
+  @Input() minDate: Date| null = null;
+  @Input() selectedDate!: Date;
 
-  constructor(protected viewContainerRef: ViewContainerRef) {}
+  constructor(protected viewContainerRef: ViewContainerRef) {
+    
+  }
 
   ngOnInit() {
     if (!this.selectedDate) this.selectedDate = new Date(this.now);
@@ -175,7 +177,7 @@ export class FkdsDatePickerComponent implements OnInit {
     return days;
   }
 
-  private createDaysPage(date) {
+  private createDaysPage(date:Date) {
     var totalDaysInMonth = DateGlobals.getLastDayOfMonth(
       date.getMonth(),
       date.getFullYear()
@@ -213,17 +215,17 @@ export class FkdsDatePickerComponent implements OnInit {
   }
 
   protected setBrowserData(year?: number, month?: number, date?: number) {
-    const isNullOrUndefined = (val) => val === undefined || val === null;
-    if (!isNullOrUndefined(year)) this.browseDate.setFullYear(year);
-    if (!isNullOrUndefined(month)) this.browseDate.setMonth(month);
-    if (!isNullOrUndefined(date)) this.browseDate.setDate(date);
+    const isNullOrUndefined = (val?:number) => val === undefined || val === null;
+    if (!isNullOrUndefined(year)) this.browseDate.setFullYear(year!);
+    if (!isNullOrUndefined(month)) this.browseDate.setMonth(month!);
+    if (!isNullOrUndefined(date)) this.browseDate.setDate(date!);
 
     this.browseDate = new Date(this.browseDate);
   }
 
   browseCalendar(direction: number) {
     if (this.calendarDays?.length) {
-      this.setBrowserData(null, this.browseDate.getMonth() + 1 * direction);
+      this.setBrowserData(undefined, this.browseDate.getMonth() + 1 * direction);
       this.renderCalendar();
     } else if (this.calendarMonths?.length) {
       this.setBrowserData(this.browseDate.getFullYear() + 1 * direction);
@@ -241,18 +243,18 @@ export class FkdsDatePickerComponent implements OnInit {
   onCalendarClicked(event: MouseEvent) {
     const target = event.target as HTMLInputElement;
     if (target?.dataset) {
-      if (target?.dataset?.day) {
-        this.setBrowserData(null, null, +target.dataset.day);
-      } else if (target?.dataset?.month) {
-        this.setBrowserData(null, +target.dataset.month);
-      } else if (target?.dataset?.year) {
-        this.setBrowserData(+target.dataset.year);
+      if (target?.dataset['day']) {
+        this.setBrowserData(undefined, undefined, +target.dataset['day']);
+      } else if (target?.dataset['month']) {
+        this.setBrowserData(undefined, +target.dataset['month']);
+      } else if (target?.dataset['year']) {
+        this.setBrowserData(+target.dataset['year']);
       }
 
       //validate date
       if (this.disabledDays.indexOf(this.browseDate.getDay()) !== -1) {
         // TODO : evaluate de nearest valid date
-        this.setBrowserData(null, null, this.browseDate.getDate() - 1);
+        this.setBrowserData(undefined, undefined, this.browseDate.getDate() - 1);
       }
 
       this.selectedDate = new Date(this.browseDate);

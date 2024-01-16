@@ -34,7 +34,7 @@ export class AppComponent {
   };
 
   dateToSelect: Date = new Date(2024, 1, 15);
-  maxDate : Date = null;//new Date(2024, 1, 15);
-  minDate: Date = null;//new Date(2024, 0, 5);
+  maxDate : Date|null=null;//new Date(2024, 1, 15);
+  minDate: Date|null=null;//new Date(2024, 0, 5);
   name = 'Angular ' + VERSION.major;
 }
